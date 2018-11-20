@@ -2297,16 +2297,16 @@ class Generator (ast.NodeVisitor):
         self.visit (node.value)
         
     def visit_AsyncFunctionDef (self, node):
-        self.visit_FunctionDef (node, async = True)
+        self.visit_FunctionDef (node, xasync = True)
     
-    def visit_FunctionDef (self, node, async = False):
+    def visit_FunctionDef (self, node, xasync = False):
         def emitScopedBody ():
             self.inscope (node)
 
             self.emitBody (node.body)
             self.dedent ()
 
-            if self.getScope (ast.AsyncFunctionDef if async else ast.FunctionDef) .containsYield:
+            if self.getScope (ast.AsyncFunctionDef if xasync else ast.FunctionDef) .containsYield:
                 # !!! Check: yield forbidden in AsyncFunctionDef
                 self.targetFragments.insert (yieldStarIndex, '*')
 
@@ -2403,19 +2403,19 @@ class Generator (ast.NodeVisitor):
                 else:
                     self.emit (' (')
 
-                self.emit ('{}function', 'async ' if async else '')
+                self.emit ('{}function', 'async ' if xasync else '')
 
             else:
                 if isGlobal:
-                    self.emit ('var {} = {}function', self.filterId (nodeName), 'async ' if async else '')
+                    self.emit ('var {} = {}function', self.filterId (nodeName), 'async ' if xasync else '')
                 else:
                     if jsCall:
-                        self.emit ('{}: function', self.filterId (nodeName), 'async ' if async else '')
+                        self.emit ('{}: function', self.filterId (nodeName), 'async ' if xasync else '')
                     else:
                         if isStaticMethod:
-                            self.emit ('get {} () {{return {}function', self.filterId (nodeName), 'async ' if async else '')
+                            self.emit ('get {} () {{return {}function', self.filterId (nodeName), 'async ' if xasync else '')
                         else:
-                            self.emit ('get {} () {{return {} (this, {}function', self.filterId (nodeName), getter, 'async ' if async else '')
+                            self.emit ('get {} () {{return {} (this, {}function', self.filterId (nodeName), getter, 'async ' if xasync else '')
 
             yieldStarIndex = len (self.targetFragments)
 
